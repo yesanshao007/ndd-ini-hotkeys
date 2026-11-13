@@ -1,0 +1,43 @@
+name: Build Notepad-- INI hotkeys DLL
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Qt 5.15.2 for MSVC x64
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '5.15.2'
+          arch: win64_msvc2019_64
+
+      - name: Build and test
+        shell: cmd
+        run: |
+          call "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          if errorlevel 1 exit /b 1
+          set "NDD_SDK_ROOT=%GITHUB_WORKSPACE%\third_party\ndd108"
+          if not exist "%NDD_SDK_ROOT%\x64\Release\qmyedit_qt5.lib" exit /b 1
+          cl /nologo /EHsc /std:c++17 section_move_test.cpp /Fe:section_move_test.exe
+          if errorlevel 1 exit /b 1
+          section_move_test.exe
+          if errorlevel 1 exit /b 1
+          qmake ndd_ini_hotkeys.pro CONFIG+=release
+          if errorlevel 1 exit /b 1
+          nmake
+          if errorlevel 1 exit /b 1
+
+      - name: Upload DLL
+        uses: actions/upload-artifact@v4
+        with:
+          name: ndd_ini_hotkeys-windows-x64
+          path: build/ndd_ini_hotkeys.dll
+          if-no-files-found: error
+          retention-days: 7
