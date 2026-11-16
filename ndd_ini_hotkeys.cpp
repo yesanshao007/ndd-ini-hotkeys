@@ -122,7 +122,14 @@ void move_current_section(QWidget* host,
     if (plan.first > static_cast<std::size_t>(std::numeric_limits<long>::max()) ||
         plan.last > static_cast<std::size_t>(std::numeric_limits<long>::max())) return;
 
+    // Selection replacement and fold changes may scroll to a temporary caret.
+    // Keep the user's display position while moving the caret with the Section.
+    const long first_visible_line = editor->SendScintilla(
+        QsciScintillaBase::SCI_GETFIRSTVISIBLELINE);
+    const long x_offset = editor->SendScintilla(QsciScintillaBase::SCI_GETXOFFSET);
     const auto folds = capture_folds(editor, text, plan);
+    const bool updates_enabled = editor->updatesEnabled();
+    if (updates_enabled) editor->setUpdatesEnabled(false);
     editor->SendScintilla(QsciScintillaBase::SCI_BEGINUNDOACTION);
     editor->SendScintilla(QsciScintillaBase::SCI_SETSEL,
                           static_cast<unsigned long>(plan.first),
@@ -130,9 +137,14 @@ void move_current_section(QWidget* host,
     editor->SendScintilla(QsciScintillaBase::SCI_REPLACESEL,
                           plan.replacement.c_str());
     editor->SendScintilla(QsciScintillaBase::SCI_ENDUNDOACTION);
-    editor->SendScintilla(QsciScintillaBase::SCI_GOTOPOS,
-                          static_cast<unsigned long>(plan.caret));
     restore_folds(editor, folds);
+    editor->SendScintilla(QsciScintillaBase::SCI_SETEMPTYSELECTION,
+                          static_cast<unsigned long>(plan.caret));
+    editor->SendScintilla(QsciScintillaBase::SCI_SETFIRSTVISIBLELINE,
+                          static_cast<unsigned long>(first_visible_line));
+    editor->SendScintilla(QsciScintillaBase::SCI_SETXOFFSET,
+                          static_cast<unsigned long>(x_offset));
+    if (updates_enabled) editor->setUpdatesEnabled(true);
     show_status(host, direction < 0 ? QStringLiteral("Section 已上移")
                                     : QStringLiteral("Section 已下移"));
 }
@@ -141,9 +153,9 @@ void move_current_section(QWidget* host,
 
 extern "C" NDD_EXPORT bool NDD_PROC_IDENTIFY(NDD_PROC_DATA* data) {
     if (!data) return false;
-    data->m_strPlugName = QStringLiteral("INI Section 移动 1.3");
+    data->m_strPlugName = QStringLiteral("INI Section 移动 1.4-rc1");
     data->m_strComment = QStringLiteral("Ctrl+Alt+上/下移动光标所在的完整 Section");
-    data->m_version = QStringLiteral("1.3");
+    data->m_version = QStringLiteral("1.4-rc1");
     data->m_auther = QStringLiteral("Codex");
     data->m_menuType = 1;
     return true;
