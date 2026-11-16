@@ -13,6 +13,8 @@
 
 如需卸载，退出 Notepad-- 后删除 `plugin\ndd_ini_hotkeys.dll`；如需回退版本，退出后恢复备份的 DLL。若启动时提示缺少 `VCRUNTIME140_1.dll` 等运行库，请安装或修复 Microsoft Visual C++ 2015–2022 x64 Redistributable。
 
+v1.4 ZIP 内的 README 是发布时快照，其中“正式 DLL 尚未复验”的文字已过时；使用者随后完成了实机验证，当前状态以 [v1.4 发布页](https://github.com/yesanshao007/ndd-ini-hotkeys/releases/tag/v1.4)和本页为准。已验收的 ZIP 与 DLL 未被替换。
+
 ## 使用
 
 | 操作 | 快捷键 |
