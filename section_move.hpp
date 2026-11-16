@@ -114,6 +114,14 @@ inline bool plan_move(const std::string& text, std::size_t caret,
     plan.caret = direction < 0
         ? first + std::min(caret - middle, right.size())
         : first + right.size() + std::min(caret - first, left.size());
+    // An EOF caret after a trailing newline would land on the next Section's
+    // header after an upward swap. Keep it before that newline instead.
+    if (direction < 0 && caret == text.size() && !text.empty() &&
+        (text.back() == '\r' || text.back() == '\n')) {
+        const std::size_t eol_size = text.size() >= 2 &&
+            text.compare(text.size() - 2, 2, "\r\n") == 0 ? 2 : 1;
+        plan.caret -= eol_size;
+    }
     return true;
 }
 

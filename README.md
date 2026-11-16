@@ -2,11 +2,11 @@
 
 为 Windows 版 Notepad-- 添加两个命令，用快捷键交换相邻的 INI Section。光标位于 Section 标题或段内任意一行即可操作；移动前折叠的 Section 在移动后保持折叠。
 
-这是第三方插件，**目前仅在 Windows x64 的 Notepad-- 3.9.2 上完成实机验收**。使用者已验证 v1.4 正式版：连续移动折叠的 Section 后，其他 Section 保持折叠，编辑视图不会跳到文件末端。其他版本、平台和特殊 INI 方言尚未验证。
+这是第三方插件，**目前仅在 Windows x64 的 Notepad-- 3.9.2 上完成实机验收**。使用者已验证 v1.4 正式版：连续移动折叠的 Section 后，其他 Section 保持折叠，编辑视图不会跳到文件末端。v1.4.1-rc1 另修复光标位于文件末尾换行之后时连续移动可能选错 Section 的问题，尚待 Windows 实机验收。其他版本、平台和特殊 INI 方言尚未验证。
 
 ## 下载与安装
 
-1. 从 [最新正式版](https://github.com/yesanshao007/ndd-ini-hotkeys/releases/latest) 下载 `NddIniHotkeys-v1.4-windows-x64.zip`；若需回退，可下载 [v1.3](https://github.com/yesanshao007/ndd-ini-hotkeys/releases/tag/v1.3)。解压取得 `ndd_ini_hotkeys.dll`，可按发布页列出的 SHA-256 校验文件。
+1. 从 [最新正式版](https://github.com/yesanshao007/ndd-ini-hotkeys/releases/latest) 下载 `NddIniHotkeys-v1.4-windows-x64.zip`；如需测试文件末尾光标修复，从 [v1.4.1-rc1 候选版](https://github.com/yesanshao007/ndd-ini-hotkeys/releases/tag/v1.4.1-rc1) 下载对应 ZIP。解压取得 `ndd_ini_hotkeys.dll`，可按发布页列出的 SHA-256 校验文件。候选版 ZIP 内的 `INSTALL.md` 只保留固定安装步骤，最新验收状态以发布页为准。
 2. 完全退出 Notepad--，找到 `Notepad--.exe` 所在目录。如果 `plugin` 目录中已有同名 DLL，先备份。
 3. 将 `ndd_ini_hotkeys.dll` 复制到 `Notepad--.exe` 同级的 `plugin` 目录，重新启动 Notepad--。在 **插件 → INI Section 移动** 中确认出现“当前 Section 上移/下移”，并核对菜单中的版本号。
 4. 先在 INI 文件副本上试用快捷键，确认移动结果和折叠状态符合预期，再处理正式文件。
@@ -24,6 +24,8 @@
 
 v1.4 在移动后恢复编辑区原有的纵向与横向滚动位置，避免编辑器因临时选区或折叠更新跳到文件末端；光标仍随被移动的 Section 走。v1.3 不包含这项修复。
 
+v1.4.1-rc1 还会在光标位于文件最后一个换行符之后时，把移动后的光标留在原 Section 内，连续按快捷键仍移动同一段。该候选版的核心逻辑测试已覆盖 LF、CRLF、CR 和无末尾换行场景，Windows 实机行为仍待验收。
+
 如果快捷键没有响应，先从插件菜单尝试同一命令：菜单能用而快捷键不能用时，检查显卡驱动或其他软件是否占用了组合键。可在源码的两个 `setShortcut(...)` 处改键并自行构建。插件**不支持拖动折叠按钮移动 Section**；鼠标点击该按钮仍执行 Notepad-- 原本的展开或折叠操作。
 
 ## Section 范围与限制
@@ -37,7 +39,7 @@ v1.4 在移动后恢复编辑区原有的纵向与横向滚动位置，避免编
 
 ### GitHub Actions（Mac 也可触发）
 
-登录 GitHub，在仓库的 **Actions → Build Notepad-- INI hotkeys DLL → Run workflow** 手动运行。工作流在 `windows-2022` x64 上安装 Qt 5.15.2 MSVC2019 64-bit，先运行移动逻辑测试，再编译 DLL。成功后在该运行页面的 **Artifacts** 下载 `ndd_ini_hotkeys-windows-x64`。Actions 产物只保留 7 天；日常安装请使用上面的 Release。
+工作流在提交到 `main`、提出 Pull Request 时自动运行，也可以登录 GitHub，在仓库的 **Actions → Build Notepad-- INI hotkeys DLL → Run workflow** 手动运行。它在 `windows-2022` x64 上安装 Qt 5.15.2 MSVC2019 64-bit，先运行移动逻辑测试，再编译 DLL。成功后在该运行页面的 **Artifacts** 下载 `ndd_ini_hotkeys-windows-x64`。Actions 产物只保留 7 天；日常安装请使用上面的 Release。
 
 Mac 只需浏览器和可运行 Actions 的 GitHub 账号，不需要本地安装 Windows、Visual Studio 或 Qt。Mac 本地不能直接用这套 MSVC/qmake 配置生成 Windows DLL。
 
@@ -52,7 +54,7 @@ Mac 只需浏览器和可运行 Actions 的 GitHub 账号，不需要本地安�
 
 ## 验证与反馈
 
-建议在测试 INI 中折叠全部 Section，从最后一个 Section 开始连续按 `Ctrl+Alt+↑` 移到最前面，逐步检查所有 Section 仍折叠、视图仍留在原区域；再用 `Ctrl+Z` 检查文本撤销。使用者已在 Windows x64 / Notepad-- 3.9.2 上确认 v1.4 正式版符合预期；这不代表所有文件和环境均已测试。
+建议在测试 INI 中折叠全部 Section，从最后一个 Section 开始连续按 `Ctrl+Alt+↑` 移到最前面，逐步检查所有 Section 仍折叠、视图仍留在原区域；再用 `Ctrl+Z` 检查文本撤销。测试 v1.4.1-rc1 时，再把光标放在带末尾换行的文件末尾，连续上移最后一个 Section，确认没有反向移回。使用者已在 Windows x64 / Notepad-- 3.9.2 上确认 v1.4 正式版符合预期；v1.4.1-rc1 仍待验收。
 
 遇到问题时，请在 [Issues](https://github.com/yesanshao007/ndd-ini-hotkeys/issues) 中写明 Notepad-- 版本、Windows 架构、操作步骤、期望与实际结果，以及是否通过插件菜单复现。分享 INI 样例前请移除账号、密钥和私人配置。
 

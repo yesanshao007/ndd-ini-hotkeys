@@ -1,6 +1,9 @@
 name: Build Notepad-- INI hotkeys DLL
 
 on:
+  push:
+    branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -10,7 +13,7 @@ jobs:
   build:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install Qt 5.15.2 for MSVC x64
         uses: jurplel/install-qt-action@v4
@@ -35,7 +38,7 @@ jobs:
           if errorlevel 1 exit /b 1
 
       - name: Upload DLL
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ndd_ini_hotkeys-windows-x64
           path: build/ndd_ini_hotkeys.dll

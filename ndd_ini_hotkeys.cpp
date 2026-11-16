@@ -153,9 +153,9 @@ void move_current_section(QWidget* host,
 
 extern "C" NDD_EXPORT bool NDD_PROC_IDENTIFY(NDD_PROC_DATA* data) {
     if (!data) return false;
-    data->m_strPlugName = QStringLiteral("INI Section 移动 1.4");
+    data->m_strPlugName = QStringLiteral("INI Section 移动 1.4.1-rc1");
     data->m_strComment = QStringLiteral("Ctrl+Alt+上/下移动光标所在的完整 Section");
-    data->m_version = QStringLiteral("1.4");
+    data->m_version = QStringLiteral("1.4.1-rc1");
     data->m_auther = QStringLiteral("Codex");
     data->m_menuType = 1;
     return true;

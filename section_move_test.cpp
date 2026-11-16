@@ -47,4 +47,28 @@ int main() {
     assert(!ini_move::plan_move(crlf, crlf.find("[B]"), 1, plan, error));
     const std::string binary("[A]\n\0[B]\n", 9);
     assert(!ini_move::plan_move(binary, 1, 1, plan, error));
+
+    // A caret at EOF must keep targeting the moved last Section, including
+    // when the file ends in a newline. Otherwise the second move undoes the first.
+    for (const auto& eol : {std::string("\n"), std::string("\r\n"),
+                            std::string("\r")}) {
+        for (const bool trailing_eol : {false, true}) {
+            const std::string original = "[A]" + eol + "a=1" + eol +
+                "[B]" + eol + "b=2" + eol + "[C]" + eol + "c=3" +
+                (trailing_eol ? eol : "");
+            std::string current = original;
+            std::size_t caret = current.size();
+            for (int step = 0; step < 2; ++step) {
+                assert(ini_move::plan_move(current, caret, -1, plan, error));
+                current = current.substr(0, plan.first) + plan.replacement +
+                          current.substr(plan.last);
+                caret = plan.caret;
+                const auto c_start = current.find("[C]");
+                const auto next_header = current.find('[', c_start + 1);
+                assert(caret >= c_start && caret < next_header);
+            }
+            assert(current.find("[C]") == 0);
+            assert(current != original);
+        }
+    }
 }
