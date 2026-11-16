@@ -13,6 +13,8 @@
 
 如需卸载，退出 Notepad-- 后删除 `plugin\ndd_ini_hotkeys.dll`；如需回退版本，退出后恢复备份的 DLL。若启动时提示缺少 `VCRUNTIME140_1.dll` 等运行库，请安装或修复 Microsoft Visual C++ 2015–2022 x64 Redistributable。
 
+v1.4 ZIP 内的 README 是发布时快照，其中“正式 DLL 尚未复验”的文字已过时；使用者随后完成了实机验证，当前状态以 [v1.4 发布页](https://github.com/yesanshao007/ndd-ini-hotkeys/releases/tag/v1.4)和本页为准。已验收的 ZIP 与 DLL 未被替换。
+
 ## 使用
 
 | 操作 | 快捷键 |
@@ -37,7 +39,7 @@ v1.4 在移动后恢复编辑区原有的纵向与横向滚动位置，避免编
 
 ### GitHub Actions（Mac 也可触发）
 
-登录 GitHub，在仓库的 **Actions → Build Notepad-- INI hotkeys DLL → Run workflow** 手动运行。工作流在 `windows-2022` x64 上安装 Qt 5.15.2 MSVC2019 64-bit，先运行移动逻辑测试，再编译 DLL。成功后在该运行页面的 **Artifacts** 下载 `ndd_ini_hotkeys-windows-x64`。Actions 产物只保留 7 天；日常安装请使用上面的 Release。
+工作流在提交到 `main`、提出 Pull Request 时自动运行，也可以登录 GitHub，在仓库的 **Actions → Build Notepad-- INI hotkeys DLL → Run workflow** 手动运行。它在 `windows-2022` x64 上安装 Qt 5.15.2 MSVC2019 64-bit，先运行移动逻辑测试，再编译 DLL。成功后在该运行页面的 **Artifacts** 下载 `ndd_ini_hotkeys-windows-x64`。Actions 产物只保留 7 天；日常安装请使用上面的 Release。
 
 Mac 只需浏览器和可运行 Actions 的 GitHub 账号，不需要本地安装 Windows、Visual Studio 或 Qt。Mac 本地不能直接用这套 MSVC/qmake 配置生成 Windows DLL。
 
